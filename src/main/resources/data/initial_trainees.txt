@@ -1,0 +1,4 @@
+Assylkhan,Valikhanov,1990-05-14,Astana
+Aldiyar,Berikbolov,1993-09-28,Almaty
+Ali,Kazymov,1995-12-01,Shymkent
+Kamal,Amitov,2000-05-25,Almaty
