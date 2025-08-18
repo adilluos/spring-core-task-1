@@ -1,53 +1,45 @@
 package com.adilzhan.firsttask.model;
 
+import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+import lombok.*;
+
+@Entity
+@Table(name = "trainers")
+@PrimaryKeyJoinColumn(name = "id")
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Trainer extends User {
+
+    @Column(nullable = false)
     private String specialization;
-    private String userId;
 
-    public Trainer() {}
+    @ManyToMany
+    @JoinTable(
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainer_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainee_id")
+    )
+    @ToString.Exclude
+    private Set<Trainee> trainees = new HashSet<>();
 
-    public Trainer(String firstName, String lastName, String username, String password, boolean isActive, String specialization, String userId) {
-        super(firstName, lastName, username, password, isActive);
+    public Trainer(String id,
+                   String firstName,
+                   String lastName,
+                   String username,
+                   String password,
+                   boolean isActive,
+                   String specialization) {
+        super(id, firstName, lastName, username, password, isActive);
         this.specialization = specialization;
-        this.userId = userId;
     }
 
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Trainer trainer = (Trainer) o;
-        return Objects.equals(specialization, trainer.specialization) && Objects.equals(userId, trainer.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), specialization, userId);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString().replace("}", "") +
-                ", specialization='" + specialization + '\'' +
-                ", userId='" + userId + '\'' +
-                '}';
-    }
 }
