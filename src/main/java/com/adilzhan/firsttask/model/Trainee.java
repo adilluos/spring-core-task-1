@@ -18,10 +18,10 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Trainee extends User {
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String address;
 
     @ManyToMany(mappedBy = "trainees")
