@@ -1,6 +1,7 @@
 package com.adilzhan.firsttask.service.web;
 
 import com.adilzhan.firsttask.dto.TrainerOption;
+import com.adilzhan.firsttask.dto.TrainingRow;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
 import com.adilzhan.firsttask.model.Training;
@@ -13,8 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TrainingService {
@@ -60,6 +64,48 @@ public class TrainingService {
         return trainerRepository.findActiveNotAssignedTo(trainee.getUsername());
     }
 
-//    public List<Training> getTraineeTrainings
+    @Transactional
+    public Trainee setTraineeTrainers(String traineeUsername, List<String> trainerUsernames) {
+        Trainee trainee = traineeRepository.findByUsername(traineeUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Trainee not found: " + traineeUsername));
+        Set<Trainer> newSet = trainerUsernames == null ? Collections.emptySet()
+                : trainerUsernames.stream()
+                .map(u -> trainerRepository.findByUsername(u)
+                        .orElseThrow(() -> new IllegalArgumentException("Trainer not found: " + u)))
+                .collect(Collectors.toSet());
+        trainee.getTrainers().clear();
+        trainee.getTrainers().addAll(newSet);
+        return trainee;
+    }
 
+    @Transactional
+    public List<TrainingRow> getTraineeTrainings(
+            String username, LocalDate from, LocalDate to, String trainerName, String trainingType) {
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("username is required");
+        }
+        return trainingRepository.findTraineeTrainings(username, from, to, emptyToNull(trainerName), emptyToNull(trainingType));
+    }
+
+    @Transactional
+    public List<TrainingRow> getTrainerTrainings(
+            String username, LocalDate from, LocalDate to, String traineeName) {
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("username is required");
+        }
+        return trainingRepository.findTrainerTrainings(username, from, to, emptyToNull(traineeName));
+    }
+
+    @Transactional
+    public List<String> listAllTrainingTypes() {
+        return typeRepository.findAll().stream()
+                .map(TrainingType::getCode)
+                .toList();
+    }
+
+    private String emptyToNull(String s) {
+        return (s == null || s.isBlank()) ? null : s;
+    }
 }

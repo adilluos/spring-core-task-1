@@ -45,4 +45,14 @@ public class TrainerController {
                 )).toList();
         return new UpdateTrainerResponse(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization(), trainer.isActive(), trainees);
     }
+
+    @PatchMapping("/activate/{username}")
+    public void activateTrainer(@PathVariable String username) {
+        profileService.activate(username);
+    }
+
+    @PatchMapping("/deactivate/{username}")
+    public void deactivateTrainer(@PathVariable String username) {
+        profileService.deactivate(username);
+    }
 }

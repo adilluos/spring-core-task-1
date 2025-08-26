@@ -24,14 +24,12 @@ public class RegistrationController {
     }
 
     @PostMapping("trainee")
-//    @ResponseStatus(HttpStatus.OK) ????????????????????
     public RegisterTraineeResponse registerTrainee(@RequestBody RegisterTraineeRequest req) {
         Trainee trainee = profileService.createTrainee(req.firstName(), req.lastName(), req.dateOfBirth(), req.address());
         return new RegisterTraineeResponse(trainee.getUsername(), trainee.getPassword());
     }
 
     @PostMapping("trainer")
-//    @ResponseStatus(HttpStatus.OK) ???????????????????????
     public RegisterTrainerResponse registerTrainer(@RequestBody RegisterTrainerRequest req) {
         Trainer trainer = profileService.createTrainer(req.firstName(), req.lastName(), req.specialization());
         return new RegisterTrainerResponse(trainer.getUsername(), trainer.getPassword());

@@ -60,4 +60,31 @@ public class TraineeController {
     public List<TrainerOption> getAvailableTrainers(@PathVariable String username) {
         return trainingService.getAvailableTrainersForTrainee(username);
     }
+
+    @PutMapping("/update-trainers-list-for-trainees/{username}")
+    public UpdateTraineeTrainersResponse updateTraineeTrainersList(
+            @PathVariable String username,
+            @RequestBody UpdateTraineeTrainersRequest request
+    ) {
+        Trainee trainee = trainingService.setTraineeTrainers(username, request.trainerUsernames());
+        List<TrainerSummary> trainers = trainee.getTrainers().stream()
+                .map(trainer -> new TrainerSummary(
+                        trainer.getUsername(),
+                        trainer.getFirstName(),
+                        trainer.getLastName(),
+                        trainer.getSpecialization()
+                ))
+                .toList();
+        return new UpdateTraineeTrainersResponse(trainers);
+    }
+
+    @PatchMapping("/activate/{username}")
+    public void activateTrainee(@PathVariable String username) {
+        profileService.activate(username);
+    }
+
+    @PatchMapping("/deactivate/{username}")
+    public void deactivateTrainee(@PathVariable String username) {
+        profileService.deactivate(username);
+    }
 }
