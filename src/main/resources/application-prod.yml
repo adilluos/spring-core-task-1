@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/firsttask
+    username: Adil
+    password: adil
+  jpa:
+    hibernate:
+      ddl-auto: none
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
