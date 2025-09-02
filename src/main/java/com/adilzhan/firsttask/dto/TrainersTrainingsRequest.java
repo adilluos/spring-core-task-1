@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 
+//as far is not used
+
 public record TrainersTrainingsRequest(
         @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String username,
         @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED) LocalDate periodFrom,

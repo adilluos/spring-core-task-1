@@ -25,8 +25,8 @@ public interface TrainingRepository extends JpaRepository<Training, String> {
           join t.trainer tr
           join t.trainee tn
         where tn.username = :username
-          and (:fromDate is null or t.trainingDate >= :fromDate)
-          and (:toDate   is null or t.trainingDate <= :toDate)
+          and t.trainingDate >= coalesce(:fromDate, t.trainingDate)
+          and t.trainingDate <= coalesce(:toDate,   t.trainingDate)
           and (:trainerNameLike is null
                or lower(tr.firstName) like :trainerNameLike
                or lower(tr.lastName)  like :trainerNameLike)
@@ -37,8 +37,8 @@ public interface TrainingRepository extends JpaRepository<Training, String> {
             @Param("username") String username,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
-            @Param("trainerNameLike") String trainerNameLike,     // e.g. "%john%"
-            @Param("trainingTypeLower") String trainingTypeLower  // e.g. "cardio"
+            @Param("trainerNameLike") String trainerNameLike,
+            @Param("trainingTypeLower") String trainingTypeLower
     );
 
     @Query("""
@@ -54,8 +54,8 @@ public interface TrainingRepository extends JpaRepository<Training, String> {
           join t.trainer tr
           join t.trainee tn
         where tr.username = :username
-          and (:fromDate is null or t.trainingDate >= :fromDate)
-          and (:toDate   is null or t.trainingDate <= :toDate)
+          and t.trainingDate >= coalesce(:fromDate, t.trainingDate)
+          and t.trainingDate <= coalesce(:toDate,   t.trainingDate)
           and (:traineeNameLike is null
                or lower(tn.firstName) like :traineeNameLike
                or lower(tn.lastName)  like :traineeNameLike)
@@ -65,6 +65,6 @@ public interface TrainingRepository extends JpaRepository<Training, String> {
             @Param("username") String username,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
-            @Param("traineeNameLike") String traineeNameLike      // e.g. "%ady%"
+            @Param("traineeNameLike") String traineeNameLike
     );
 }

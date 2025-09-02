@@ -12,12 +12,12 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ToString(callSuper = false)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(callSuper = false) //No parent fields in toString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) //In this class, equals and hashcode will be built only by marked fields (below)
 public abstract class User {
     @Id
     @Column
-    @EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include //This marked field. By the way, it is a good practice for entities to have eq and hc only by id
     private String id;
 
     @Column(nullable = false)

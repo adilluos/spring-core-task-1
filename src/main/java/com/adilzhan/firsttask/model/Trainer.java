@@ -10,7 +10,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "trainers")
-@PrimaryKeyJoinColumn(name = "id")
+@PrimaryKeyJoinColumn(name = "id") //PK of this is also FK for 'users'. Also we customized name
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,12 +22,7 @@ public class Trainer extends User {
     @Column(nullable = false)
     private String specialization;
 
-    @ManyToMany
-    @JoinTable(
-            name = "trainer_trainee",
-            joinColumns = @JoinColumn(name = "trainer_id"),
-            inverseJoinColumns = @JoinColumn(name = "trainee_id")
-    )
+    @ManyToMany(mappedBy = "trainers") //The parameter has the string of the field in the "owning" class. in this case, it is Set of trainers
     @ToString.Exclude
     private Set<Trainee> trainees = new HashSet<>();
 

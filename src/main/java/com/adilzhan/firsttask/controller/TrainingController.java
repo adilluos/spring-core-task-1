@@ -6,8 +6,12 @@ import com.adilzhan.firsttask.dto.TrainersTrainingsRequest;
 import com.adilzhan.firsttask.dto.TrainingRow;
 import com.adilzhan.firsttask.service.web.TrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -25,14 +29,36 @@ public class TrainingController {
         trainingService.addTraining(request.trainerUsername(), request.traineeUsername(), request.typeCode(), request.date(), request.duration(), request.description());
     }
 
-    @GetMapping("/get-trainees-trainings")
-    public List<TrainingRow> getTraineeTrainings(@RequestBody TraineesTrainingsRequest request) {
-        return trainingService.getTraineeTrainings(request.username(), request.periodFrom(), request.periodTo(), request.trainerName(), request.trainingType());
+    @GetMapping("/get-trainees-trainings/{username}")
+    public List<TrainingRow> getTraineeTrainings(@PathVariable
+                                                 String username,
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(iso = DATE)
+                                                 LocalDate periodFrom,
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(iso = DATE)
+                                                 LocalDate periodTo,
+                                                 @RequestParam(required = false)
+                                                 String trainerName,
+                                                 @RequestParam(required = false)
+                                                 String trainingType
+    ) {
+        return trainingService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType);
     }
 
-    @GetMapping("/get-trainers-trainings")
-    public List<TrainingRow> getTrainerTrainings(@RequestBody TrainersTrainingsRequest request) {
-        return trainingService.getTrainerTrainings(request.username(), request.periodFrom(), request.periodTo(), request.traineeName());
+    @GetMapping("/get-trainers-trainings/{username}")
+    public List<TrainingRow> getTrainerTrainings(@PathVariable
+                                                 String username,
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(iso = DATE)
+                                                 LocalDate periodFrom,
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(iso = DATE)
+                                                 LocalDate periodTo,
+                                                 @RequestParam(required = false)
+                                                 String traineeName
+    ) {
+        return trainingService.getTrainerTrainings(username, periodFrom, periodTo, traineeName);
     }
 
     @GetMapping("/get-training-types")

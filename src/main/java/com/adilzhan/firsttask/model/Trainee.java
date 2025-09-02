@@ -24,7 +24,12 @@ public class Trainee extends User {
 //    @Column(nullable = false)
     private String address;
 
-    @ManyToMany(mappedBy = "trainees")
+    @ManyToMany
+    @JoinTable(
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
     @ToString.Exclude
     private Set<Trainer> trainers = new HashSet<>();
 
