@@ -2,6 +2,7 @@ package com.adilzhan.firsttask.service.web;
 
 import com.adilzhan.firsttask.dto.TrainerOption;
 import com.adilzhan.firsttask.dto.TrainingRow;
+import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
 import com.adilzhan.firsttask.model.Training;
@@ -26,13 +27,15 @@ public class TrainingService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final TrainingTypeRepository typeRepository;
+    private final TrainingMetrics trainingMetrics;
 
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
         this.typeRepository = typeRepository;
+        this.trainingMetrics = trainingMetrics;
     }
 
     @Transactional
@@ -54,6 +57,9 @@ public class TrainingService {
         String id = UUID.randomUUID().toString();
         Training training = new Training(id, trainer, trainee, trainingType, date, duration, description);
         trainingRepository.save(training);
+
+        trainingMetrics.incTrainingCreated(trainingType.getCode());
+
         return training;
     }
 
@@ -85,7 +91,7 @@ public class TrainingService {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("username is required");
         }
-        return trainingRepository.findTraineeTrainings(username, from, to, emptyToNull(trainerName), emptyToNull(trainingType));
+        return trainingMetrics.timeSearch("trainee", () -> trainingRepository.findTraineeTrainings(username, from, to, emptyToNull(trainerName), emptyToNull(trainingType)));
     }
 
     @Transactional
@@ -95,7 +101,7 @@ public class TrainingService {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("username is required");
         }
-        return trainingRepository.findTrainerTrainings(username, from, to, emptyToNull(traineeName));
+        return trainingMetrics.timeSearch("trainer", () -> trainingRepository.findTrainerTrainings(username, from, to, emptyToNull(traineeName)));
     }
 
     @Transactional
