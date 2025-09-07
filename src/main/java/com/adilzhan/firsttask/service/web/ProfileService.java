@@ -1,5 +1,7 @@
 package com.adilzhan.firsttask.service.web;
 
+import com.adilzhan.firsttask.dto.RegisterTraineeResponse;
+import com.adilzhan.firsttask.dto.RegisterTrainerResponse;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
 import com.adilzhan.firsttask.model.User;
@@ -9,6 +11,7 @@ import com.adilzhan.firsttask.repository.UserRepository;
 import com.adilzhan.firsttask.util.UsernamePasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ public class ProfileService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final AuthService authService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     public ProfileService(UserRepository userRepository, TraineeRepository traineeRepository, TrainerRepository trainerRepository, AuthService authService) {
@@ -34,30 +38,32 @@ public class ProfileService {
     }
 
     @Transactional
-    public Trainer createTrainer(String firstName, String lastName, String specialization) {
+    public RegisterTrainerResponse createTrainer(String firstName, String lastName, String specialization) {
         String username = nextUsername(firstName, lastName);
         String password = UsernamePasswordGenerator.generatePassword();
+        String hashed = passwordEncoder.encode(password);
         String id = UUID.randomUUID().toString();
 
-        Trainer trainer = new Trainer(id, firstName, lastName, username, password, true, specialization);
+        Trainer trainer = new Trainer(id, firstName, lastName, username, hashed, true, specialization);
         trainerRepository.save(trainer);
         log.info("Created trainer {} ({})", username, id);
-        return trainer;
+        return new RegisterTrainerResponse(username, password);
     }
 
     @Transactional
-    public Trainee createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
+    public RegisterTraineeResponse createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
 //        if (dateOfBirth == null || address == null || address.isBlank())
 //            throw new IllegalArgumentException("dateOfBirth and address are required");
 
         String username = nextUsername(firstName, lastName);
         String password = UsernamePasswordGenerator.generatePassword();
+        String hashed = passwordEncoder.encode(password);
         String id = UUID.randomUUID().toString();
 
-        Trainee trainee = new Trainee(id, firstName, lastName, username, password, true, dateOfBirth, address);
+        Trainee trainee = new Trainee(id, firstName, lastName, username, hashed, true, dateOfBirth, address);
         traineeRepository.save(trainee);
-        log.info("Created trainee {} ({})", username, id);
-        return trainee;
+        log.info("Created trainee {} ({}), {}", username, id, password);
+        return new RegisterTraineeResponse(username, password);
     }
 
     public String nextUsername(String firstName, String lastName) {
@@ -105,7 +111,8 @@ public class ProfileService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
         if (newPassword == null || newPassword.isBlank())
             throw new IllegalArgumentException("New password is empty");
-        user.setPassword(newPassword);
+        String hashed = passwordEncoder.encode(newPassword);
+        user.setPassword(hashed);
         log.info("Password changed for {}", username);
     }
 

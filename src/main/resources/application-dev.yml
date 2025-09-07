@@ -20,3 +20,11 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
+security:
+  jwt:
+    secret: "l9KkXr8y0vZ2D0m0jzQ3rC2o6Jb1O8SxYwG6QyqvJmA="
+    expiration-minutes: 15
+  bruteForce:
+    maxAttempts: 3
+    lockMinutes: 5
