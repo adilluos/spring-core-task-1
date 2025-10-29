@@ -28,3 +28,8 @@ security:
   bruteForce:
     maxAttempts: 3
     lockMinutes: 5
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
