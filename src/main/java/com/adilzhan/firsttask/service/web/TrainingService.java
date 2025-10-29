@@ -1,9 +1,7 @@
 package com.adilzhan.firsttask.service.web;
 
 import com.adilzhan.firsttask.client.WorkloadClient;
-import com.adilzhan.firsttask.dto.TrainerOption;
-import com.adilzhan.firsttask.dto.TrainingRow;
-import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
+import com.adilzhan.firsttask.dto.*;
 import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
 import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
