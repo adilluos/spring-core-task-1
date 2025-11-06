@@ -3,6 +3,7 @@ package com.adilzhan.firsttask.service.web;
 import com.adilzhan.firsttask.client.WorkloadClient;
 import com.adilzhan.firsttask.dto.*;
 import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
+import com.adilzhan.firsttask.messaging.WorkloadMessageProducer;
 import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
@@ -32,15 +33,17 @@ public class TrainingService {
     private final TrainingTypeRepository typeRepository;
     private final TrainingMetrics trainingMetrics;
     private final WorkloadClientService workloadClientService;
+    private final WorkloadMessageProducer workloadMessageProducer;
 
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics, WorkloadClientService workloadClientService) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics, WorkloadClientService workloadClientService, WorkloadMessageProducer workloadMessageProducer) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
         this.typeRepository = typeRepository;
         this.trainingMetrics = trainingMetrics;
         this.workloadClientService = workloadClientService;
+        this.workloadMessageProducer = workloadMessageProducer;
     }
 
     @Transactional
@@ -74,12 +77,13 @@ public class TrainingService {
                 "ADD"
         );
 
-        try {
-            workloadClientService.sendWorkloadUpdate(request);
-            System.out.println("Workload update sent to workload-service");
-        } catch (Exception ex) {
-            System.err.println("Failed to notify workload-service: " + ex.getMessage());
-        }
+//        try {
+//            workloadClientService.sendWorkloadUpdate(request);
+//            System.out.println("Workload update sent to workload-service");
+//        } catch (Exception ex) {
+//            System.err.println("Failed to notify workload-service: " + ex.getMessage());
+//        }
+        workloadMessageProducer.sendWorkloadUpdate(request);
 
         trainingMetrics.incTrainingCreated(trainingType.getCode());
         return training;
