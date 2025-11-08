@@ -14,6 +14,8 @@ import com.adilzhan.firsttask.repository.TrainerRepository;
 import com.adilzhan.firsttask.repository.TrainingRepository;
 import com.adilzhan.firsttask.repository.TrainingTypeRepository;
 import com.adilzhan.firsttask.service.integration.WorkloadClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class TrainingService {
+    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
+
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
@@ -76,6 +80,7 @@ public class TrainingService {
                 training.getDuration(),
                 "ADD"
         );
+        //todo logging connected with workload-service
 
 //        try {
 //            workloadClientService.sendWorkloadUpdate(request);
@@ -107,6 +112,7 @@ public class TrainingService {
                 .collect(Collectors.toSet());
         trainee.getTrainers().clear();
         trainee.getTrainers().addAll(newSet);
+        log.info("Updated Trainers List for Trainee: {} trainers were added to Trainee - {}", newSet.size(), traineeUsername);
         return trainee;
     }
 
