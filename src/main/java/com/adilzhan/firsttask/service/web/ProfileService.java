@@ -2,6 +2,7 @@ package com.adilzhan.firsttask.service.web;
 
 import com.adilzhan.firsttask.dto.RegisterTraineeResponse;
 import com.adilzhan.firsttask.dto.RegisterTrainerResponse;
+import com.adilzhan.firsttask.exception.InvalidCredentialsException;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
 import com.adilzhan.firsttask.model.User;
@@ -106,7 +107,7 @@ public class ProfileService {
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         if (!authService.authenticate(username, oldPassword))
-            throw new SecurityException("Authentication failed");
+            throw new InvalidCredentialsException("Authentication failed");
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
         if (newPassword == null || newPassword.isBlank())

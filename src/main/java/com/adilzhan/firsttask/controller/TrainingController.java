@@ -78,4 +78,9 @@ public class TrainingController {
                                   @PathVariable int month) {
         return workloadClient.getMonthlyWorkload(username, year, month);
     }
+
+    @DeleteMapping("/deleteTraining/{id}")
+    public void deleteTraining(@PathVariable String id) {
+        trainingService.deleteTrainingById(id);
+    }
 }

@@ -27,10 +27,10 @@ public class AuthServiceTest {
 
     @Test
     void authenticate_ok() {
-        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "12345", true, "YOGA");
+        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "$2a$10$fOsQo9fTgtgMGiH0tsNCn.UCGOWylLF4WCxDywTMcZO2ynmYuHuCK", true, "YOGA");
         when(userRepository.findByUsername("Ali.Uly")).thenReturn(Optional.of(trainer));
 
-        boolean authenticated = authService.authenticate("Ali.Uly", "12345");
+        boolean authenticated = authService.authenticate("Ali.Uly", "testtest");
 
         assertTrue(authenticated);
         verify(userRepository).findByUsername("Ali.Uly");
@@ -38,7 +38,7 @@ public class AuthServiceTest {
 
     @Test
     void authenticate_badPassword() {
-        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "12345", true, "YOGA");
+        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "$2a$10$fOsQo9fTgtgMGiH0tsNCn.UCGOWylLF4WCxDywTMcZO2ynmYuHuCK", true, "YOGA");
         when(userRepository.findByUsername("Ali.Uly")).thenReturn(Optional.of(trainer));
 
         assertFalse(authService.authenticate("Ali.Uly", "9999"));
@@ -46,7 +46,7 @@ public class AuthServiceTest {
 
     @Test
     void authenticate_userNotFound() {
-        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "12345", true, "YOGA");
+        Trainer trainer = new Trainer("123", "Ali", "Uly", "Ali.Uly", "$2a$10$fOsQo9fTgtgMGiH0tsNCn.UCGOWylLF4WCxDywTMcZO2ynmYuHuCK", true, "YOGA");
         lenient().when(userRepository.findByUsername("Ali.Uly")).thenReturn(Optional.of(trainer));
 
         assertFalse(authService.authenticate("Not.User", "12345"));

@@ -21,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -141,6 +138,14 @@ public class TrainingService {
         return typeRepository.findAll().stream()
                 .map(TrainingType::getCode)
                 .toList();
+    }
+
+    @Transactional
+    public void deleteTrainingById(String id) {
+        Training training = trainingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Training not found: " + id));
+        trainingRepository.delete(training);
+        log.warn("Deleted training {}", id);
     }
 
     private String emptyToNull(String s) {
