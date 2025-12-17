@@ -1,6 +1,7 @@
 package com.adilzhan.firsttask.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
@@ -9,10 +10,13 @@ import org.springframework.jms.core.JmsTemplate;
 public class ActiveMqConfig {
     public static final String WORKLOAD_QUEUE = "workload.updates";
 
+    //todo: add basic url to application.yml
     @Bean
-    public ActiveMQConnectionFactory activeMQConnectionFactory() {
+    public ActiveMQConnectionFactory activeMQConnectionFactory(
+            @Value("${app.activemq.broker-url}") String brokerUrl
+    ) {
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-        factory.setBrokerURL("tcp://localhost:61616");
+        factory.setBrokerURL(brokerUrl);
         return factory;
     }
 
