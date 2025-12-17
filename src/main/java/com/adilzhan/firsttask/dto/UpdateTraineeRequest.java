@@ -7,10 +7,10 @@ import java.time.LocalDate;
 
 public record UpdateTraineeRequest(
         @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String username,
-        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String firstName,
-        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String lastName,
+//        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String firstName,
+//        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String lastName,
         @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED) LocalDate dateOfBirth,
-        @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED) String address,
-        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean isActive
+        @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED) String address
+//        @NotBlank @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean isActive
 ) {
 }

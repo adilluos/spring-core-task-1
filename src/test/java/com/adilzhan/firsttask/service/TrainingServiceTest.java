@@ -2,6 +2,8 @@ package com.adilzhan.firsttask.service;
 
 import com.adilzhan.firsttask.dto.TrainerOption;
 import com.adilzhan.firsttask.dto.TrainingRow;
+import com.adilzhan.firsttask.messaging.WorkloadMessageProducer;
+import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
 import com.adilzhan.firsttask.model.Training;
@@ -10,6 +12,7 @@ import com.adilzhan.firsttask.repository.TraineeRepository;
 import com.adilzhan.firsttask.repository.TrainerRepository;
 import com.adilzhan.firsttask.repository.TrainingRepository;
 import com.adilzhan.firsttask.repository.TrainingTypeRepository;
+import com.adilzhan.firsttask.service.integration.WorkloadClientService;
 import com.adilzhan.firsttask.service.web.TrainingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,6 +40,12 @@ public class TrainingServiceTest {
     private TrainingRepository trainingRepository;
     @Mock
     private TrainingTypeRepository typeRepository;
+    @Mock
+    private TrainingMetrics trainingMetrics;
+    @Mock
+    private WorkloadClientService workloadClientService;
+    @Mock
+    private WorkloadMessageProducer workloadMessageProducer;
 
     @InjectMocks
     private TrainingService trainingService;
@@ -93,17 +103,53 @@ public class TrainingServiceTest {
     }
 
     @Test
+    void setTraineeTrainers() {
+        Trainer trainer1 = new Trainer("tr1", "Ali", "Uly", "Ali.Uly", "pw", true, "YOGA");
+        Trainer trainer2 = new Trainer("tr2", "Ali", "Uly", "Ali.Uly.2", "pw", true, "YOGA");
+        List<String> trainerUsernames = List.of("Ali.Uly", "Ali.Uly.2");
+        Trainee trainee = new Trainee("tn1", "Zhan", "Bek", "Zhan.Bek", "pw", true,
+                LocalDate.of(2001, 5, 17), "Abay st.");
+
+        Trainer oldTrainer = new Trainer("old", "Old", "Trainer", "Old.Trainer", "pw", true, "CARDIO");
+        trainee.getTrainers().add(oldTrainer);
+
+        when(trainerRepository.findByUsername("Ali.Uly")).thenReturn(Optional.of(trainer1));
+        when(trainerRepository.findByUsername("Ali.Uly.2")).thenReturn(Optional.of(trainer2));
+        when(traineeRepository.findByUsername("Zhan.Bek")).thenReturn(Optional.of(trainee));
+
+        Trainee updatedTrainee = trainingService.setTraineeTrainers("Zhan.Bek", trainerUsernames);
+
+        assertSame(trainee, updatedTrainee);
+        assertEquals(2, trainee.getTrainers().size());
+        assertTrue(trainee.getTrainers().contains(trainer1));
+        assertTrue(trainee.getTrainers().contains(trainer2));
+        assertFalse(trainee.getTrainers().contains(oldTrainer));
+
+        verify(traineeRepository).findByUsername("Zhan.Bek");
+        verify(trainerRepository).findByUsername("Ali.Uly");
+        verify(trainerRepository).findByUsername("Ali.Uly.2");
+
+        verifyNoMoreInteractions(traineeRepository, trainerRepository);
+    }
+
+    @Test
     void getTraineeTrainings() {
         List<TrainingRow> rows = List.of(
-                new TrainingRow("Run", LocalDate.of(2025, 8, 1), "CARDIO", 30, "Ali Uly")
+                new TrainingRow("Run", LocalDate.of(2025, 8, 1), "CARDIO", 30, "Ali Uly"),
+                new TrainingRow("Run", LocalDate.of(2025, 8, 2), "CARDIO", 30, "Ali Uly")
         );
         when(trainingRepository.findTraineeTrainings(eq("Zhan.Bek"),
                 any(), any(), isNull(), isNull())).thenReturn(rows);
+        when(trainingMetrics.timeSearch(eq("trainee"), any()))
+                .thenAnswer(inv -> {
+                    Supplier<List<TrainingRow>> supplier = inv.getArgument(1);
+                    return supplier.get();
+                });
 
         List<TrainingRow> result = trainingService.getTraineeTrainings(
                 "Zhan.Bek", null, null, " ", "");
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         verify(trainingRepository).findTraineeTrainings(eq("Zhan.Bek"),
                 isNull(), isNull(), isNull(), isNull());
     }
@@ -111,15 +157,21 @@ public class TrainingServiceTest {
     @Test
     void getTrainerTrainings() {
         List<TrainingRow> rows = List.of(
-                new TrainingRow("Run", LocalDate.of(2025, 8, 1), "CARDIO", 30, "Zhan Bek")
+                new TrainingRow("Run", LocalDate.of(2025, 8, 1), "CARDIO", 30, "Zhan Bek"),
+                new TrainingRow("Run", LocalDate.of(2025, 8, 2), "CARDIO", 30, "Zhan Bek")
         );
         when(trainingRepository.findTrainerTrainings(eq("Ali.Uly"),
                 any(), any(), isNull())).thenReturn(rows);
+        when(trainingMetrics.timeSearch(eq("trainer"), any()))
+                .thenAnswer(inv -> {
+                    Supplier<List<TrainingRow>> supplier = inv.getArgument(1);
+                    return supplier.get();
+                });
 
         List<TrainingRow> result = trainingService.getTrainerTrainings(
                 "Ali.Uly", null, null, "");
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         verify(trainingRepository).findTrainerTrainings(eq("Ali.Uly"),
                 isNull(), isNull(), isNull());
     }

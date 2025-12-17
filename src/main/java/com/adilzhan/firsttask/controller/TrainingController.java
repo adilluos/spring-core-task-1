@@ -1,9 +1,7 @@
 package com.adilzhan.firsttask.controller;
 
-import com.adilzhan.firsttask.dto.CreateTrainingRequest;
-import com.adilzhan.firsttask.dto.TraineesTrainingsRequest;
-import com.adilzhan.firsttask.dto.TrainersTrainingsRequest;
-import com.adilzhan.firsttask.dto.TrainingRow;
+import com.adilzhan.firsttask.client.WorkloadClient;
+import com.adilzhan.firsttask.dto.*;
 import com.adilzhan.firsttask.service.web.TrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,15 +11,18 @@ import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/training")
 public class TrainingController {
     private final TrainingService trainingService;
+    private final WorkloadClient workloadClient;
 
     @Autowired
-    public TrainingController(TrainingService trainingService) {
+    public TrainingController(TrainingService trainingService, WorkloadClient workloadClient) {
         this.trainingService = trainingService;
+        this.workloadClient = workloadClient;
     }
 
     @PostMapping("/add-training")
@@ -64,5 +65,22 @@ public class TrainingController {
     @GetMapping("/get-training-types")
     public List<String> getAllTrainingTypes() {
         return trainingService.listAllTrainingTypes();
+    }
+
+    @GetMapping("/get-trainer-workload")
+    public Map<String, WorkloadTrainerResponse> getAllWorkloads() {
+        return workloadClient.getAllWorkloads();
+    }
+
+    @GetMapping("/{username}/{year}/{month}")
+    public int getMonthlyWorkload(@PathVariable String username,
+                                  @PathVariable int year,
+                                  @PathVariable int month) {
+        return workloadClient.getMonthlyWorkload(username, year, month);
+    }
+
+    @DeleteMapping("/deleteTraining/{id}")
+    public void deleteTraining(@PathVariable String id) {
+        trainingService.deleteTrainingById(id);
     }
 }

@@ -1,7 +1,9 @@
 package com.adilzhan.firsttask.service.web;
 
-import com.adilzhan.firsttask.dto.TrainerOption;
-import com.adilzhan.firsttask.dto.TrainingRow;
+import com.adilzhan.firsttask.client.WorkloadClient;
+import com.adilzhan.firsttask.dto.*;
+import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
+import com.adilzhan.firsttask.messaging.WorkloadMessageProducer;
 import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
@@ -11,31 +13,38 @@ import com.adilzhan.firsttask.repository.TraineeRepository;
 import com.adilzhan.firsttask.repository.TrainerRepository;
 import com.adilzhan.firsttask.repository.TrainingRepository;
 import com.adilzhan.firsttask.repository.TrainingTypeRepository;
+import com.adilzhan.firsttask.service.integration.WorkloadClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class TrainingService {
+    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
+
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final TrainingTypeRepository typeRepository;
     private final TrainingMetrics trainingMetrics;
+    private final WorkloadClientService workloadClientService;
+    private final WorkloadMessageProducer workloadMessageProducer;
 
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics, WorkloadClientService workloadClientService, WorkloadMessageProducer workloadMessageProducer) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
         this.typeRepository = typeRepository;
         this.trainingMetrics = trainingMetrics;
+        this.workloadClientService = workloadClientService;
+        this.workloadMessageProducer = workloadMessageProducer;
     }
 
     @Transactional
@@ -58,8 +67,27 @@ public class TrainingService {
         Training training = new Training(id, trainer, trainee, trainingType, date, duration, description);
         trainingRepository.save(training);
 
-        trainingMetrics.incTrainingCreated(trainingType.getCode());
 
+        WorkloadUpdateRequest request = new WorkloadUpdateRequest(
+                trainer.getUsername(),
+                trainer.getFirstName(),
+                trainer.getLastName(),
+                trainer.isActive(),
+                training.getTrainingDate(),
+                training.getDuration(),
+                "ADD"
+        );
+        //todo logging connected with workload-service
+
+//        try {
+//            workloadClientService.sendWorkloadUpdate(request);
+//            System.out.println("Workload update sent to workload-service");
+//        } catch (Exception ex) {
+//            System.err.println("Failed to notify workload-service: " + ex.getMessage());
+//        }
+        workloadMessageProducer.sendWorkloadUpdate(request);
+
+        trainingMetrics.incTrainingCreated(trainingType.getCode());
         return training;
     }
 
@@ -81,6 +109,7 @@ public class TrainingService {
                 .collect(Collectors.toSet());
         trainee.getTrainers().clear();
         trainee.getTrainers().addAll(newSet);
+        log.info("Updated Trainers List for Trainee: {} trainers were added to Trainee - {}", newSet.size(), traineeUsername);
         return trainee;
     }
 
@@ -109,6 +138,14 @@ public class TrainingService {
         return typeRepository.findAll().stream()
                 .map(TrainingType::getCode)
                 .toList();
+    }
+
+    @Transactional
+    public void deleteTrainingById(String id) {
+        Training training = trainingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Training not found: " + id));
+        trainingRepository.delete(training);
+        log.warn("Deleted training {}", id);
     }
 
     private String emptyToNull(String s) {

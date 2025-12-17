@@ -28,3 +28,14 @@ security:
   bruteForce:
     maxAttempts: 3
     lockMinutes: 5
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+service-auth:
+  shared-secret: "T2V2V1d3ZHNzRjZHa2hsM3Q1Ym13SldoWVRnNGRtQWJUV1lXbG5uUnJzSjhRMzFhQzJkNHd5YUtsc1FqVFRoNlNyYw=="
+  issuer: "firsttask"
+  audience: "workload-service"
+  ttl-minutes: 15
