@@ -39,3 +39,7 @@ service-auth:
   issuer: "firsttask"
   audience: "workload-service"
   ttl-minutes: 15
+
+app:
+  activemq:
+    broker-url: tcp://localhost:61616

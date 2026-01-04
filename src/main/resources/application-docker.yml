@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/firsttask
+    username: Adil
+    password: adil
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka
+
+security:
+  jwt:
+    secret: "l9KkXr8y0vZ2D0m0jzQ3rC2o6Jb1O8SxYwG6QyqvJmA="
+    expiration-minutes: 15
+  bruteForce:
+    maxAttempts: 3
+    lockMinutes: 5
+
+service-auth:
+  shared-secret: "T2V2V1d3ZHNzRjZHa2hsM3Q1Ym13SldoWVRnNGRtQWJUV1lXbG5uUnJzSjhRMzFhQzJkNHd5YUtsc1FqVFRoNlNyYw=="
+  issuer: "firsttask"
+  audience: "workload-service"
+  ttl-minutes: 15
+
+app:
+  activemq:
+    broker-url: tcp://activemq:61616
+
+volumes:
+  - ~/.m2:/root/.m2
