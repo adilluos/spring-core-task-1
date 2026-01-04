@@ -10,7 +10,6 @@ import org.springframework.jms.core.JmsTemplate;
 public class ActiveMqConfig {
     public static final String WORKLOAD_QUEUE = "workload.updates";
 
-    //todo: add basic url to application.yml
     @Bean
     public ActiveMQConnectionFactory activeMQConnectionFactory(
             @Value("${app.activemq.broker-url}") String brokerUrl
