@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://simpleadilzhan-db.cvmwsimymstw.eu-central-1.rds.amazonaws.com:5432/firsttask?sslmode=require
+    username: postgresadil
+    password: adiladil
+    jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+security:
+  jwt:
+    secret: "l9KkXr8y0vZ2D0m0jzQ3rC2o6Jb1O8SxYwG6QyqvJmA="
+    expiration-minutes: 15
+  bruteForce:
+    maxAttempts: 3
+    lockMinutes: 5
+
+service-auth:
+  shared-secret: "T2V2V1d3ZHNzRjZHa2hsM3Q1Ym13SldoWVRnNGRtQWJUV1lXbG5uUnJzSjhRMzFhQzJkNHd5YUtsc1FqVFRoNlNyYw=="
+  issuer: "firsttask"
+  audience: "workload-service"
+  ttl-minutes: 15
+
+eureka:
+  client:
+    enabled: false
