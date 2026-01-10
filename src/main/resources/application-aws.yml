@@ -27,3 +27,7 @@ service-auth:
 eureka:
   client:
     enabled: false
+
+app:
+  sqs:
+    queue-url: https://sqs.eu-central-1.amazonaws.com/656673948657/SimpleAdilzhan-Queue

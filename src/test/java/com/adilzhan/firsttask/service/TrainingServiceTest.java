@@ -2,7 +2,7 @@ package com.adilzhan.firsttask.service;
 
 import com.adilzhan.firsttask.dto.TrainerOption;
 import com.adilzhan.firsttask.dto.TrainingRow;
-import com.adilzhan.firsttask.messaging.WorkloadMessageProducer;
+import com.adilzhan.firsttask.messaging.JmsWorkloadMessageSender;
 import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
@@ -45,7 +45,7 @@ public class TrainingServiceTest {
     @Mock
     private WorkloadClientService workloadClientService;
     @Mock
-    private WorkloadMessageProducer workloadMessageProducer;
+    private JmsWorkloadMessageSender jmsWorkloadMessageSender;
 
     @InjectMocks
     private TrainingService trainingService;
