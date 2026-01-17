@@ -1,9 +1,9 @@
 package com.adilzhan.firsttask.service.web;
 
-import com.adilzhan.firsttask.client.WorkloadClient;
 import com.adilzhan.firsttask.dto.*;
 import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
-import com.adilzhan.firsttask.messaging.WorkloadMessageProducer;
+import com.adilzhan.firsttask.messaging.JmsWorkloadMessageSender;
+import com.adilzhan.firsttask.messaging.WorkloadMessageSender;
 import com.adilzhan.firsttask.metrics.TrainingMetrics;
 import com.adilzhan.firsttask.model.Trainee;
 import com.adilzhan.firsttask.model.Trainer;
@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,17 +33,17 @@ public class TrainingService {
     private final TrainingTypeRepository typeRepository;
     private final TrainingMetrics trainingMetrics;
     private final WorkloadClientService workloadClientService;
-    private final WorkloadMessageProducer workloadMessageProducer;
+    private final WorkloadMessageSender workloadMessageSender;
 
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics, WorkloadClientService workloadClientService, WorkloadMessageProducer workloadMessageProducer) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingRepository trainingRepository, TrainingTypeRepository typeRepository, TrainingMetrics trainingMetrics, WorkloadClientService workloadClientService, WorkloadMessageSender workloadMessageSender) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
         this.typeRepository = typeRepository;
         this.trainingMetrics = trainingMetrics;
         this.workloadClientService = workloadClientService;
-        this.workloadMessageProducer = workloadMessageProducer;
+        this.workloadMessageSender = workloadMessageSender;
     }
 
     @Transactional
@@ -85,7 +84,7 @@ public class TrainingService {
 //        } catch (Exception ex) {
 //            System.err.println("Failed to notify workload-service: " + ex.getMessage());
 //        }
-        workloadMessageProducer.sendWorkloadUpdate(request);
+        workloadMessageSender.sendWorkloadUpdate(request);
 
         trainingMetrics.incTrainingCreated(trainingType.getCode());
         return training;

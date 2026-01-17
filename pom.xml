@@ -156,6 +156,12 @@
             <version>7.15.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+            <version>2.41.4</version>
+        </dependency>
+
 
     </dependencies>
     <dependencyManagement>

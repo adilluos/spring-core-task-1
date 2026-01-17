@@ -4,14 +4,16 @@ import com.adilzhan.firsttask.config.ActiveMqConfig;
 import com.adilzhan.firsttask.dto.WorkloadUpdateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WorkloadMessageProducer {
+@Profile("!aws")
+public class JmsWorkloadMessageSender implements WorkloadMessageSender{
     private final JmsTemplate jmsTemplate;
 
-    public WorkloadMessageProducer(JmsTemplate jmsTemplate) {
+    public JmsWorkloadMessageSender(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
 
